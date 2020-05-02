@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+    networks:
+      - backend
+    restart: always
+
+  server:
+    build: .
+    ports:
+      - 5000:5000
+    networks:
+      - backend
+    depends_on:
+      - mongo
+    restart: always
+    environment:
+      MONGO: "mongodb://mongo"
+
+networks:
+  backend:
