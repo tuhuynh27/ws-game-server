@@ -11,7 +11,7 @@ type Hub struct {
 	clients map[*Client]string
 
 	// Inbound messages from the clients.
-	broadcast chan Chat
+	broadcast chan *Chat
 
 	// Register requests from the clients.
 	register chan *Client
@@ -26,7 +26,7 @@ type Hub struct {
 func NewHub(service *Service) *Hub {
 	return &Hub{
 		clients:    make(map[*Client]string),
-		broadcast:  make(chan Chat),
+		broadcast:  make(chan *Chat),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		service: 	service,

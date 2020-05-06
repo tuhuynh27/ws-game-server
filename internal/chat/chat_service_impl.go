@@ -52,7 +52,7 @@ func (s *Service) ListService() ([]*Chat, error) {
 	return results, nil
 }
 
-func (s *Service) InsertOneService(newChat Chat) (string, error) {
+func (s *Service) InsertOneService(newChat *Chat) (string, error) {
 	chatCollection := s.Mongo.Collection(CollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

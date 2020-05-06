@@ -19,6 +19,7 @@ type Mongo struct {
 func Load() *Config {
 	var cfg = &Config{}
 	viper.SetConfigType("yaml")
+	viper.SetConfigFile("config/config.yaml")
 
 	err := viper.ReadInConfig()
 	if err != nil {

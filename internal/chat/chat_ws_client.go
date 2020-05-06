@@ -77,7 +77,7 @@ func (c *Client) readPump() {
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 
 		unixTime := time.Now().Unix()
-		newChat := Chat{User: c.user, Message: string(message), Time: unixTime}
+		newChat := &Chat{User: c.user, Message: string(message), Time: unixTime}
 		c.hub.broadcast <- newChat
 	}
 }
