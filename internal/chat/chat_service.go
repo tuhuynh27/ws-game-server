@@ -2,16 +2,15 @@ package chat
 
 import (
 	"context"
-	"github.com/oddx-team/odd-game-server/configs"
+	"time"
+
 	"github.com/oddx-team/odd-game-server/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"time"
 )
 
-func ListService() ([]Chat, error) {
-	chatCollection := configs.GetMongo().Collection(CollectionName)
+func (s *Services) ListService() ([]*Chat, error) {
+	chatCollection := s.Mongo.Collection(CollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -25,14 +24,14 @@ func ListService() ([]Chat, error) {
 	}
 	defer cur.Close(ctx)
 
-	var results []Chat
+	var results []*Chat
 	for cur.Next(ctx) {
 		var result Chat
 		err := cur.Decode(&result)
 		if err != nil {
 			return nil, err
 		}
-		results = append(results, result)
+		results = append(results, &result)
 	}
 	if err := cur.Err(); err != nil {
 		return nil, err
@@ -42,15 +41,15 @@ func ListService() ([]Chat, error) {
 	return results, nil
 }
 
-func InsertOneService(newChat Chat) (string, error) {
-	chatCollection := configs.GetMongo().Collection(CollectionName)
+func (s *Services) InsertOneService(newChat Chat) (string, error) {
+	chatCollection := s.Mongo.Collection(CollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	inserted, err := chatCollection.InsertOne(ctx, newChat)
 	if err != nil {
-		log.Println(err.Error())
+		return "", err
 	}
 
 	return (inserted.InsertedID).(string), nil

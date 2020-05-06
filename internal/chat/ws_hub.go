@@ -29,7 +29,8 @@ func NewHub() *Hub {
 	}
 }
 
-func (h *Hub) Run() {
+func (s *Services) Run() {
+	h := s.Hub
 	for {
 		select {
 		case client := <-h.register:
@@ -40,13 +41,13 @@ func (h *Hub) Run() {
 				close(client.send)
 			}
 		case newChat := <-h.broadcast:
-			go InsertOneService(newChat)
+			go s.InsertOneService(newChat)
 
-			newChatJson, _ := json.Marshal(newChat)
+			newChatJSON, _ := json.Marshal(newChat)
 
 			for client := range h.clients {
 				select {
-				case client.send <- newChatJson:
+				case client.send <- newChatJSON:
 				default:
 					close(client.send)
 					delete(h.clients, client)
