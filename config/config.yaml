@@ -1,3 +1,4 @@
+port: 5000
 mongo:
     host: mongodb://localhost:27017
     database_name: odd-game

@@ -1,36 +1,50 @@
 package main
 
 import (
-	"context"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/oddx-team/odd-game-server/config"
 	"github.com/oddx-team/odd-game-server/internal/chat"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
 	cfg := config.Load()
-	mongo := mustConnectMongo(cfg)
-	hub := chat.NewHub()
-	services := chat.New(mongo, hub)
+	mongoConn := config.NewMongoConnection(cfg.Mongo.Host, cfg.Mongo.DatabaseName)
 
-	log.Println("Started at port 5000!")
-	log.Fatal(http.ListenAndServe(":5000", NewRouter(services)))
+	chatService := chat.NewService(mongoConn)
+	chatHandler := chat.NewHandler(chatService)
+	chatWsHub := chat.NewHub(chatService)
+	chatRouter := chat.NewRouter(chatHandler, chatWsHub)
+
+	r := serveHTTP()
+	r.Route("/api/v1/chat", chatRouter.Routes)
+
+	log.Println("Started at port " + cfg.Port)
+	log.Fatal(http.ListenAndServe(":" + cfg.Port, r))
 }
 
-func mustConnectMongo(cfg *config.Config) *mongo.Database {
-	client, err := mongo.NewClient(options.Client().ApplyURI(cfg.Mongo.Host))
-	if err != nil {
-		log.Panic(err)
-	}
-	ctx := context.Background()
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	return client.Database(cfg.Mongo.DatabaseName)
+func serveHTTP() *chi.Mux {
+	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.URLFormat)
+	corsOptions := cors.New(cors.Options{
+		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	})
+	r.Use(corsOptions.Handler)
+	r.Use(middleware.Timeout(30 * time.Second))
+	return r
 }
