@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 
 	"github.com/oddx-team/odd-game-server/config"
 	"github.com/oddx-team/odd-game-server/internal/chat"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	cfg := config.Load()
-	mongoConn := config.NewMongoConnection(cfg.Mongo.Host, cfg.Mongo.DatabaseName)
+	mongoConn := cfg.NewMongoConnection(cfg.Mongo.Host, cfg.Mongo.DatabaseName)
 
 	chatService := chat.NewService(mongoConn)
 	chatHandler := chat.NewHandler(chatService)
@@ -25,7 +26,7 @@ func main() {
 	r.Route("/api/v1/chat", chatRouter.Routes)
 
 	log.Println("Started at port " + cfg.Port)
-	log.Fatal(http.ListenAndServe(":" + cfg.Port, r))
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
 }
 
 func serveHTTP() *chi.Mux {
