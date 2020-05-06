@@ -55,7 +55,7 @@ func (s *Service) ListService() ([]*Chat, error) {
 func (s *Service) InsertOneService(newChat Chat) (string, error) {
 	chatCollection := s.Mongo.Collection(CollectionName)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	inserted, err := chatCollection.InsertOne(ctx, newChat)
