@@ -20,9 +20,8 @@ services:
     restart: always
     environment:
       port: 5000
-      mongo:
-        host: mongodb://localhost:27017
-        database_name: odd-game
+      mongo:host: mongodb://localhost:27017
+      mongo:database_name: odd-game
 
 networks:
   backend:
