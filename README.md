@@ -4,7 +4,7 @@
 
 - Install [Go](https://golang.org/) and [Docker](https://docs.docker.com/install/).
 - Run `docker-compose up mongo -d` to start MongoDB in background (or you can start with local MongoDB).
-- Run `go run ./cmd/odd-game-server/main.go` to start development.
+- Run `go run ./cmd/server/main.go` to start development.
 
 ## Production
 

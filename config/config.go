@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	Port string `yaml:"port" mapstructure:"port"`
 	Mongo Mongo `yaml:"mongo" mapstructure:"mongo"`
 }
 
@@ -17,6 +18,7 @@ type Mongo struct {
 }
 
 var defaultConfig = []byte(`
+port: 5000
 mongo:
     host: mongodb://localhost:27017
     database_name: odd-game

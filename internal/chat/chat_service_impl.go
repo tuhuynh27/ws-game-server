@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
 	"github.com/oddx-team/odd-game-server/pkg/utils"
@@ -9,7 +10,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (s *Services) ListService() ([]*Chat, error) {
+type Service struct {
+	Mongo 		*mongo.Database
+}
+
+func NewService(mongo *mongo.Database) *Service {
+	return &Service{
+		Mongo: mongo,
+	}
+}
+
+func (s *Service) ListService() ([]*Chat, error) {
 	chatCollection := s.Mongo.Collection(CollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -37,11 +48,11 @@ func (s *Services) ListService() ([]*Chat, error) {
 		return nil, err
 	}
 
-	utils.ReverseAny(results)
+	utils.Reverse(results)
 	return results, nil
 }
 
-func (s *Services) InsertOneService(newChat Chat) (string, error) {
+func (s *Service) InsertOneService(newChat Chat) (string, error) {
 	chatCollection := s.Mongo.Collection(CollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

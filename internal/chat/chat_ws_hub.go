@@ -18,19 +18,22 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	// Service mongo
+	service *Service
 }
 
-func NewHub() *Hub {
+func NewHub(service *Service) *Hub {
 	return &Hub{
+		clients:    make(map[*Client]string),
 		broadcast:  make(chan Chat),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:    make(map[*Client]string),
+		service: 	service,
 	}
 }
 
-func (s *Services) Run() {
-	h := s.Hub
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
@@ -41,7 +44,7 @@ func (s *Services) Run() {
 				close(client.send)
 			}
 		case newChat := <-h.broadcast:
-			go s.InsertOneService(newChat)
+			go h.service.InsertOneService(newChat)
 
 			newChatJSON, _ := json.Marshal(newChat)
 

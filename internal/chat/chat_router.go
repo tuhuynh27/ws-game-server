@@ -6,12 +6,24 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func (s *Services) Routes(r chi.Router) {
-	r.Get("/", s.ListHandler)
+type Router struct {
+	Handler *Handler
+	Hub 	*Hub
+}
 
-	go s.Run()
+func NewRouter(handler *Handler, hub *Hub) *Router {
+	return &Router{
+		Handler: handler,
+		Hub: hub,
+	}
+}
 
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ServeWs(s.Hub, w, r)
+func (r *Router) Routes(c chi.Router) {
+	c.Get("/", r.Handler.ListHandler)
+
+	go r.Hub.Run()
+
+	c.HandleFunc("/ws", func(w http.ResponseWriter, req *http.Request) {
+		ServeWs(r.Hub, w, req)
 	})
 }

@@ -6,10 +6,20 @@ import (
 	"github.com/oddx-team/odd-game-server/pkg/json"
 )
 
-func (s *Services) ListHandler(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+	Service IService
+}
+
+func NewHandler(service IService) *Handler {
+	return &Handler{
+		Service: service,
+	}
+}
+
+func (h *Handler) ListHandler(w http.ResponseWriter, _ *http.Request) {
 	res := json.Response{ResponseWriter: w}
 
-	chats, err := s.ListService()
+	chats, err := h.Service.ListService()
 	if err != nil {
 		res.SendBadRequest(err.Error())
 	}
