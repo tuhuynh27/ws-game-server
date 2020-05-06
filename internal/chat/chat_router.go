@@ -16,15 +16,15 @@ func NewRouter(handler *Handler, hub *Hub) *Router {
 	return &Router{
 		Handler: handler,
 		Hub: hub,
-		Routes: getRoutes(),
+		Routes: getRoutes(handler, hub),
 	}
 }
 
-func getRoutes() http.Handler {
+func getRoutes(handler *Handler, hub *Hub) http.Handler {
 	c := chi.NewRouter()
-	c.Get("/", r.Handler.ListHandler)
+	c.Get("/", handler.ListHandler)
 	c.HandleFunc("/ws", func(w http.ResponseWriter, req *http.Request) {
-		ServeWs(r.Hub, w, req)
+		ServeWs(hub, w, req)
 	})
 
 	return c
