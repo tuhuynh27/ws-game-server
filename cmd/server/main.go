@@ -22,7 +22,8 @@ func main() {
 	chatRouter := chat.NewRouter(chatHandler, chatWsHub)
 
 	r := serveHTTP()
-	r.Route("/api/v1/chat", chatRouter.Routes)
+	chatRouter.Hub.Run()
+	r.Mount("/api/v1/chat", chatRouter.Routes)
 
 	log.Println("Started at port " + cfg.Port)
 	log.Fatal(http.ListenAndServe(":" + cfg.Port, r))
