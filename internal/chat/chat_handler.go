@@ -1,14 +1,15 @@
 package chat
 
 import (
-	"github.com/oddx-team/odd-game-server/pkg/json"
 	"net/http"
+
+	"github.com/oddx-team/odd-game-server/pkg/json"
 )
 
-func ListHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Services) ListHandler(w http.ResponseWriter, r *http.Request) {
 	res := json.Response{ResponseWriter: w}
 
-	chats, err := ListService()
+	chats, err := s.ListService()
 	if err != nil {
 		res.SendBadRequest(err.Error())
 	}

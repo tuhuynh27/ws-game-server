@@ -1,15 +1,15 @@
-package server
+package main
 
 import (
-	"github.com/oddx-team/odd-game-server/internal/chat"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/oddx-team/odd-game-server/internal/chat"
 )
 
-func NewRouter() *chi.Mux {
+func NewRouter(s *chat.Services) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -30,7 +30,7 @@ func NewRouter() *chi.Mux {
 	r.Use(corsOptions.Handler)
 	r.Use(middleware.Timeout(30 * time.Second))
 
-	r.Route("/api/v1/chat", chat.Routes)
+	r.Route("/api/v1/chat", s.Routes)
 
 	return r
 }

@@ -1,17 +1,17 @@
 package chat
 
 import (
-	"github.com/go-chi/chi"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
-func Routes(r chi.Router) {
-	r.Get("/", ListHandler)
+func (s *Services) Routes(r chi.Router) {
+	r.Get("/", s.ListHandler)
 
-	hub := NewHub()
-	go hub.Run()
+	go s.Run()
 
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ServeWs(hub, w, r)
+		ServeWs(s.Hub, w, r)
 	})
 }
